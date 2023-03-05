@@ -1,7 +1,9 @@
 package gblink
 
 import (
+	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 type MapStringInterface map[string]interface{}
@@ -309,4 +311,362 @@ func (m MapStringInterface) Clear() {
 	for k := range m {
 		delete(m, k)
 	}
+}
+
+// Json stringifies the map.
+//
+// Example:
+//
+//	m := gblink.MapStringInterface{
+//	    "one": 1,
+//	    "two": 2,
+//	    "three": 3,
+//	}
+//	s, err := m.JsonString()
+//	fmt.Println(s) // {"one":1,"two":2,"three":3}
+func (m MapStringInterface) JsonString() (string, error) {
+	b, err := json.Marshal(m)
+	if err != nil {
+		return "", MapError{fmt.Errorf("MapError: Cannot marshal %e", err)}
+	}
+	return string(b), err
+}
+
+// Return a value with nested keys. If the key does not exist, return the error
+// MapError.
+//
+// Example:
+//
+//		m := gblink.MapStringInterface{
+//		    "a": 1,
+//		    "b": &gblink.MapStringInterface{
+//		        "c": 2,
+//		        "d": &gblink.MapStringInterface{
+//		            "e": 3,
+//		        },
+//		    },
+//		}
+//		v, err := m.GetDeep("a.b.c")
+//	 if err != nil {
+//	     fmt.Println(err) // MapError: Key "a.b.c" does not exist
+//	 }
+//		v , err := m.GetDeep("b.d.e")
+//		fmt.Println(v) // 3
+func (m MapStringInterface) GetDeep(keys string) (interface{}, error) {
+	keysSlice := strings.Split(keys, ".")
+	return m.getDeep(keysSlice)
+}
+
+func (m MapStringInterface) getDeep(keys []string) (interface{}, error) {
+	if len(keys) == 0 {
+		return nil, MapError{fmt.Errorf("MapError: No keys provided")}
+	}
+
+	if len(keys) == 1 {
+		v, ok := m[keys[0]]
+		if !ok {
+			return nil, MapError{fmt.Errorf("MapError: Key %q does not exist", keys[0])}
+		}
+		return v, nil
+	}
+
+	// Length of keys is greater than 1
+	v, ok := m[keys[0]]
+	if !ok {
+		return nil, MapError{fmt.Errorf("MapError: Key %q does not exist", keys[0])}
+	}
+
+	m2, ok := v.(MapStringInterface)
+	if !ok {
+		return nil, MapError{fmt.Errorf("MapError: Key %q is not a map", keys[0])}
+	}
+
+	return m2.getDeep(keys[1:])
+}
+
+// Set a value with nested keys.
+//
+// Example:
+//
+//	m := gblink.MapStringInterface{}
+//	m.SetDeep("a.b.c", 1)
+//	fmt.Println(m) // map[a:map[b:map[c:1]]]
+func (m MapStringInterface) SetDeep(keys string, value interface{}) {
+	keysSlice := strings.Split(keys, ".")
+	m.setDeep(keysSlice, value)
+}
+
+func (m MapStringInterface) setDeep(keys []string, value interface{}) {
+	if len(keys) == 0 {
+		return
+	}
+
+	if len(keys) == 1 {
+		m[keys[0]] = value
+		return
+	}
+
+	// Length of keys is greater than 1
+	v, ok := m[keys[0]]
+	if !ok {
+		m[keys[0]] = MapStringInterface{}
+		v = m[keys[0]]
+	}
+
+	m2, ok := v.(MapStringInterface)
+	if !ok {
+		m2 = MapStringInterface{}
+		m[keys[0]] = m2
+	}
+
+	m2.setDeep(keys[1:], value)
+}
+
+// Delete a value with nested keys.
+//
+// Example:
+//
+//	m := gblink.MapStringInterface{
+//	    "a": 1,
+//	    "b": &gblink.MapStringInterface{
+//	        "c": 2,
+//	        "d": &gblink.MapStringInterface{
+//	            "e": 3,
+//	        },
+//	    },
+//	}
+//	m.DeleteDeep("b.d.e")
+//	fmt.Println(m) // map[a:1 b:map[c:2 d:map[]]]
+func (m MapStringInterface) DeleteDeep(keys string) {
+	keysSlice := strings.Split(keys, ".")
+	m.deleteDeep(keysSlice)
+}
+
+func (m MapStringInterface) deleteDeep(keys []string) {
+	if len(keys) == 0 {
+		return
+	}
+
+	if len(keys) == 1 {
+		delete(m, keys[0])
+		return
+	}
+
+	// Length of keys is greater than 1
+	v, ok := m[keys[0]]
+	if !ok {
+		return
+	}
+
+	m2, ok := v.(MapStringInterface)
+	if !ok {
+		return
+	}
+
+	m2.deleteDeep(keys[1:])
+}
+
+// Return true if the nested key exists.
+//
+// Example:
+//
+//	m := gblink.MapStringInterface{
+//	    "a": 1,
+//	    "b": &gblink.MapStringInterface{
+//	        "c": 2,
+//	        "d": &gblink.MapStringInterface{
+//	            "e": 3,
+//	        },
+//	    },
+//	}
+//	fmt.Println(m.HasDeep("a")) // true
+//	fmt.Println(m.HasDeep("b.d.e")) // true
+//	fmt.Println(m.HasDeep("b.d.f")) // false
+func (m MapStringInterface) HasDeep(keys string) bool {
+	keysSlice := strings.Split(keys, ".")
+	return m.hasDeep(keysSlice)
+}
+
+func (m MapStringInterface) hasDeep(keys []string) bool {
+	if len(keys) == 0 {
+		return false
+	}
+
+	if len(keys) == 1 {
+		_, ok := m[keys[0]]
+		return ok
+	}
+
+	// Length of keys is greater than 1
+	v, ok := m[keys[0]]
+	if !ok {
+		return false
+	}
+
+	m2, ok := v.(MapStringInterface)
+	if !ok {
+		return false
+	}
+
+	return m2.hasDeep(keys[1:])
+}
+
+// Clean a map by removing all keys with specified values.
+//
+// Example:
+//
+//	m := gblink.MapStringInterface{
+//	    "a": 1,
+//	    "b": 2,
+//	    "c": 3,
+//	}
+//
+// mCleaned := m.Clean(nil)
+// fmt.Println(mCleaned) // map[a:1 b:2 c:3]
+func (m MapStringInterface) Clean(value interface{}) MapStringInterface {
+	cleanedMap := MapStringInterface{}
+	for k, v := range m {
+		if v != value {
+			cleanedMap[k] = v
+		}
+	}
+
+	return cleanedMap
+}
+
+// Clean a map by removing all keys if the callback returns true.
+//
+// Example:
+//
+//	m := gblink.MapStringInterface{
+//	    "a": 1,
+//	    "b": 2,
+//	    "c": 3,
+//	}
+//
+//	mCleaned := m.CleanIf(func(key string, value interface{}) bool {
+//	    return value == 2
+//	})
+//
+// fmt.Println(mCleaned) // map[a:1 c:3]
+func (m MapStringInterface) CleanIf(callback func(key string, value interface{}) bool) MapStringInterface {
+	cleanedMap := MapStringInterface{}
+	for k, v := range m {
+		if !callback(k, v) {
+			cleanedMap[k] = v
+		}
+	}
+
+	return cleanedMap
+}
+
+// Clean deep a map by removing all keys with specified values.
+//
+// Example:
+//
+//	m := gblink.MapStringInterface{
+//	    "a": 1,
+//	    "b": &gblink.MapStringInterface{
+//	        "c": 2,
+//	        "d": &gblink.MapStringInterface{
+//	            "e": 3,
+//	        },
+//	    },
+//	}
+//
+// mCleaned := m.CleanDeep(nil)
+// fmt.Println(mCleaned) // map[a:1 b:map[c:2 d:map[e:3]]]
+func (m MapStringInterface) CleanDeep(value interface{}) MapStringInterface {
+	cleanedMap := MapStringInterface{}
+	for k, v := range m {
+		if v != value {
+			if m2, ok := v.(MapStringInterface); ok {
+				cleanedMap[k] = m2.CleanDeep(value)
+			} else {
+				cleanedMap[k] = v
+			}
+		}
+	}
+
+	return cleanedMap
+}
+
+// Clean deep a map by removing all keys if the callback returns true.
+//
+// Example:
+//
+//	m := gblink.MapStringInterface{
+//	    "a": 1,
+//	    "b": &gblink.MapStringInterface{
+//	        "c": 2,
+//	        "d": &gblink.MapStringInterface{
+//	            "e": 3,
+//	        },
+//	    },
+//	}
+//
+//	mCleaned := m.CleanDeepIf(func(key string, value interface{}) bool {
+//	    return value == 2
+//	})
+//
+// fmt.Println(mCleaned) // map[a:1 b:map[d:map[e:3]]]
+func (m MapStringInterface) CleanDeepIf(callback func(key string, value interface{}) bool) MapStringInterface {
+	cleanedMap := MapStringInterface{}
+	for k, v := range m {
+		if !callback(k, v) {
+			if m2, ok := v.(MapStringInterface); ok {
+				cleanedMap[k] = m2.CleanDeepIf(callback)
+			} else {
+				cleanedMap[k] = v
+			}
+		}
+	}
+
+	return cleanedMap
+}
+
+// Deep merge maps.
+//
+// Example:
+//
+//	m1 := gblink.MapStringInterface{
+//	    "a": 1,
+//	    "b": &gblink.MapStringInterface{
+//	        "c": 2,
+//	        "d": &gblink.MapStringInterface{
+//	            "e": 3,
+//	        },
+//	    },
+//	}
+//
+//	m2 := gblink.MapStringInterface{
+//	    "a": 4,
+//	    "b": &gblink.MapStringInterface{
+//	        "d": &gblink.MapStringInterface{
+//	            "f": 5,
+//	        },
+//	    },
+//	}
+//
+//	m3 := m1.MergeDeep(m2)
+//	fmt.Println(m3) // map[a:4 b:map[c:2 d:map[e:3 f:5]]]
+func (m MapStringInterface) MergeDeep(m2 MapStringInterface) MapStringInterface {
+	mergedMap := MapStringInterface{}
+	for k, v := range m {
+		mergedMap[k] = v
+	}
+
+	for k, v := range m2 {
+		if m2v, ok := v.(MapStringInterface); ok {
+			if m1v, ok := mergedMap[k].(MapStringInterface); ok {
+				mergedMap[k] = m1v.MergeDeep(m2v)
+			} else {
+				mergedMap[k] = m2v
+			}
+		} else {
+			mergedMap[k] = v
+		}
+	}
+
+	return mergedMap
 }
