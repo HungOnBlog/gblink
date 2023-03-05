@@ -274,3 +274,39 @@ func (m MapStringInterface) Each(f func(string, interface{})) {
 		f(k, v)
 	}
 }
+
+// Clone the map.
+//
+// Example:
+//
+//	m := gblink.MapStringInterface{
+//	    "one": 1,
+//	    "two": 2,
+//	    "three": 3,
+//	}
+//	m2 := m.Clone()
+//	fmt.Println(m2) // map[one:1 two:2 three:3]
+func (m MapStringInterface) Clone() MapStringInterface {
+	clone := MapStringInterface{}
+	for k, v := range m {
+		clone[k] = v
+	}
+	return clone
+}
+
+// Clear the map.
+//
+// Example:
+//
+//	m := gblink.MapStringInterface{
+//	    "one": 1,
+//	    "two": 2,
+//	    "three": 3,
+//	}
+//	m.Clear()
+//	fmt.Println(m) // map[]
+func (m MapStringInterface) Clear() {
+	for k := range m {
+		delete(m, k)
+	}
+}

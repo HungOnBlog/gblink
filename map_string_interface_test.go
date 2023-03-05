@@ -197,3 +197,28 @@ func TestMapStringInterface_Each(t *testing.T) {
 		assert.Equal(m[key], value)
 	})
 }
+
+func TestMapStringInterface_Clone(t *testing.T) {
+	m := MapStringInterface{
+		"one":   1,
+		"two":   2,
+		"three": 3,
+	}
+	assert := assert.New(t)
+
+	m2 := m.Clone()
+
+	assert.Equal(m, m2)
+}
+
+func TestMapStringInterface_Clear(t *testing.T) {
+	m := MapStringInterface{
+		"one":   1,
+		"two":   2,
+		"three": 3,
+	}
+	assert := assert.New(t)
+
+	m.Clear()
+	assert.Equal(0, m.Len())
+}
