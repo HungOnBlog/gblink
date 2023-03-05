@@ -23,6 +23,8 @@ If you don't want to install the package, you can also use it directly in your c
 
 ### Map (Generic)
 
+This type of map is suitable for flat data structures. It is not suitable for nested data structures.
+
 ```go
 package gblink
 
