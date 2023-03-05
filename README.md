@@ -242,6 +242,96 @@ func (m Map[K, V]) Filter(predicate func(K, V) bool) Map[K, V] {
  return filtered
 }
 
+// Delete the key k from the map.
+//
+// Example:
+//
+// m := gblink.Map[int, string]{
+//     1: "one",
+//     2: "two",
+//     3: "three",
+// }
+// m.Delete(2)
+// fmt.Println(m) // map[1:one 3:three]
+func (m Map[K, V]) Delete(k K) {
+ delete(m, k)
+}
+
+// Delete the key-value pairs from the map that satisfy the predicate.
+//
+// Example:
+//
+// m := gblink.Map[int, string]{
+//     1: "one",
+//     2: "two",
+//     3: "three",
+// }
+// m.DeleteIf(func(k int, v string) bool {
+//     return k > 1
+// })
+// fmt.Println(m) // map[1:one]
+func (m Map[K, V]) DeleteIf(predicate func(K, V) bool) {
+ for k, v := range m {
+  if predicate(k, v) {
+   delete(m, k)
+  }
+ }
+}
+
+// Run callback for each key-value pair in the map.
+//
+// Example:
+//
+// m := gblink.Map[int, string]{
+//     1: "one",
+//     2: "two",
+//     3: "three",
+// }
+// m.Each(func(k int, v string) {
+//     fmt.Println(k, v)
+// }) // 1 one 2 two 3 three
+func (m Map[K, V]) Each(callback func(K, V)) {
+ for k, v := range m {
+  callback(k, v)
+ }
+}
+
+// Clone the map.
+//
+// Example:
+//
+// m := gblink.Map[int, string]{
+//     1: "one",
+//     2: "two",
+//     3: "three",
+// }
+// m2 := m.Clone()
+// fmt.Println(m2) // map[1:one 2:two 3:three]
+func (m Map[K, V]) Clone() Map[K, V] {
+ clone := Map[K, V]{}
+ for k, v := range m {
+  clone[k] = v
+ }
+ return clone
+}
+
+// Clear the map.
+//
+// Example:
+//
+// m := gblink.Map[int, string]{
+//     1: "one",
+//     2: "two",
+//     3: "three",
+// }
+// m.Clear()
+// fmt.Println(m) // map[]
+func (m Map[K, V]) Clear() {
+ for k := range m {
+  delete(m, k)
+ }
+}
+
 ```
 
 ### MapStringInterface
