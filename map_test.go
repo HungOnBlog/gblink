@@ -183,3 +183,54 @@ func TestMap_Filter(t *testing.T) {
 	assert.Equal(1, len(m2))
 	assert.Equal("two", m2[2])
 }
+
+func TestMap_Delete(t *testing.T) {
+	assert := assert.New(t)
+
+	m := Map[int, string]{
+		1: "one",
+		2: "two",
+		3: "three",
+	}
+
+	m.Delete(2)
+	assert.Equal(2, len(m))
+	assert.Equal("one", m[1])
+	assert.Equal("three", m[3])
+}
+
+func TestMap_DeleteIf(t *testing.T) {
+	assert := assert.New(t)
+
+	m := Map[int, string]{
+		1: "one",
+		2: "two",
+		3: "three",
+	}
+
+	m.DeleteIf(func(k int, v string) bool {
+		return k%2 == 0
+	})
+
+	assert.Equal(2, len(m))
+	assert.Equal("one", m[1])
+	assert.Equal("three", m[3])
+}
+
+func TestMap_Each(t *testing.T) {
+	assert := assert.New(t)
+
+	m := Map[int, string]{
+		1: "one",
+		2: "two",
+		3: "three",
+	}
+
+	m.Each(func(k int, v string) {
+		m[k] = v + "!"
+	})
+
+	assert.Equal("one!", m[1])
+	assert.Equal("two!", m[2])
+	assert.Equal("three!", m[3])
+}
