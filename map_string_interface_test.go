@@ -154,3 +154,46 @@ func TestMapStringInterface_Filter(t *testing.T) {
 	assert.Equal(2, mm["two"])
 	assert.Equal(3, mm["three"])
 }
+
+func TestMapStringInterface_Delete(t *testing.T) {
+	m := MapStringInterface{
+		"one":   1,
+		"two":   2,
+		"three": 3,
+	}
+	assert := assert.New(t)
+
+	m.Delete("one")
+	assert.Equal(2, m.Len())
+	assert.Equal(2, m["two"])
+	assert.Equal(3, m["three"])
+}
+
+func TestMapStringInterface_DeleteIf(t *testing.T) {
+	m := MapStringInterface{
+		"one":   1,
+		"two":   2,
+		"three": 3,
+	}
+	assert := assert.New(t)
+
+	m.DeleteIf(func(key string, value interface{}) bool {
+		return value.(int) > 1
+	})
+
+	assert.Equal(1, m.Len())
+	assert.Equal(1, m["one"])
+}
+
+func TestMapStringInterface_Each(t *testing.T) {
+	m := MapStringInterface{
+		"one":   1,
+		"two":   2,
+		"three": 3,
+	}
+	assert := assert.New(t)
+
+	m.Each(func(key string, value interface{}) {
+		assert.Equal(m[key], value)
+	})
+}

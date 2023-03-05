@@ -219,3 +219,58 @@ func (m MapStringInterface) Filter(f func(string, interface{}) bool) MapStringIn
 	}
 	return filtered
 }
+
+// Delete the key/value pair with the key k.
+//
+// Example:
+//
+//	m := gblink.MapStringInterface{
+//	    "one": 1,
+//	    "two": 2,
+//	    "three": 3,
+//	}
+//	m.Delete("two")
+//	fmt.Println(m) // map[one:1 three:3]
+func (m MapStringInterface) Delete(k string) {
+	delete(m, k)
+}
+
+// Delete a random key/value pair from the map that satisfies the callback
+// function f.
+//
+// Example:
+//
+//	m := gblink.MapStringInterface{
+//	    "one": 1,
+//	    "two": 2,
+//	    "three": 3,
+//	}
+//	m.DeleteFunc(func(k string, v interface{}) bool {
+//	    return v.(int) > 1
+//	})
+//	fmt.Println(m) // map[one:1]
+func (m MapStringInterface) DeleteIf(f func(string, interface{}) bool) {
+	for k, v := range m {
+		if f(k, v) {
+			delete(m, k)
+		}
+	}
+}
+
+// Call the callback function f for each key/value pair in the map.
+//
+// Example:
+//
+//	m := gblink.MapStringInterface{
+//	    "one": 1,
+//	    "two": 2,
+//	    "three": 3,
+//	}
+//	m.Each(func(k string, v interface{}) {
+//	    fmt.Println(k, v)
+//	})
+func (m MapStringInterface) Each(f func(string, interface{})) {
+	for k, v := range m {
+		f(k, v)
+	}
+}
