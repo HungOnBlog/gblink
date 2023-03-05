@@ -269,3 +269,39 @@ func (m Map[K, V]) Each(callback func(K, V)) {
 		callback(k, v)
 	}
 }
+
+// Clone the map.
+//
+// Example:
+//
+//	m := gblink.Map[int, string]{
+//	    1: "one",
+//	    2: "two",
+//	    3: "three",
+//	}
+//	m2 := m.Clone()
+//	fmt.Println(m2) // map[1:one 2:two 3:three]
+func (m Map[K, V]) Clone() Map[K, V] {
+	clone := Map[K, V]{}
+	for k, v := range m {
+		clone[k] = v
+	}
+	return clone
+}
+
+// Clear the map.
+//
+// Example:
+//
+//	m := gblink.Map[int, string]{
+//	    1: "one",
+//	    2: "two",
+//	    3: "three",
+//	}
+//	m.Clear()
+//	fmt.Println(m) // map[]
+func (m Map[K, V]) Clear() {
+	for k := range m {
+		delete(m, k)
+	}
+}

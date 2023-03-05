@@ -234,3 +234,31 @@ func TestMap_Each(t *testing.T) {
 	assert.Equal("two!", m[2])
 	assert.Equal("three!", m[3])
 }
+
+func TestMap_Clone(t *testing.T) {
+	assert := assert.New(t)
+
+	m := Map[int, string]{
+		1: "one",
+		2: "two",
+		3: "three",
+	}
+
+	m2 := m.Clone()
+
+	assert.Equal(m, m2)
+}
+
+func TestMap_Clear(t *testing.T) {
+	assert := assert.New(t)
+
+	m := Map[int, string]{
+		1: "one",
+		2: "two",
+		3: "three",
+	}
+
+	m.Clear()
+
+	assert.Equal(0, len(m))
+}

@@ -32,6 +32,11 @@ github.com/HungOnBlog/gblink/map.go:248.22,249.22 1 1
 github.com/HungOnBlog/gblink/map.go:249.22,251.4 1 1
 github.com/HungOnBlog/gblink/map.go:267.46,268.22 1 1
 github.com/HungOnBlog/gblink/map.go:268.22,270.3 1 1
+github.com/HungOnBlog/gblink/map.go:284.38,286.22 2 1
+github.com/HungOnBlog/gblink/map.go:286.22,288.3 1 1
+github.com/HungOnBlog/gblink/map.go:289.2,289.14 1 1
+github.com/HungOnBlog/gblink/map.go:303.28,304.19 1 1
+github.com/HungOnBlog/gblink/map.go:304.19,306.3 1 1
 github.com/HungOnBlog/gblink/map_string_interface.go:25.64,27.9 2 1
 github.com/HungOnBlog/gblink/map_string_interface.go:27.9,29.3 1 1
 github.com/HungOnBlog/gblink/map_string_interface.go:30.2,30.15 1 1
