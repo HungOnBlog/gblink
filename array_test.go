@@ -139,6 +139,12 @@ func TestArray_Find(t *testing.T) {
 	})
 
 	assert.Equal(2, b)
+
+	c := a.Find(func(i int) bool {
+		return i > 3
+	})
+
+	assert.Equal(0, c)
 }
 
 func TestArray_FindIndex(t *testing.T) {
@@ -152,6 +158,12 @@ func TestArray_FindIndex(t *testing.T) {
 	})
 
 	assert.Equal(1, b)
+
+	c := a.FindIndex(func(i int) bool {
+		return i > 3
+	})
+
+	assert.Equal(-1, c)
 }
 
 func TestArray_FindLast(t *testing.T) {
@@ -165,6 +177,12 @@ func TestArray_FindLast(t *testing.T) {
 	})
 
 	assert.Equal(3, b)
+
+	c := a.FindLast(func(i int) bool {
+		return i > 3
+	})
+
+	assert.Equal(0, c)
 }
 
 func TestArray_FindLastIndex(t *testing.T) {
@@ -178,6 +196,12 @@ func TestArray_FindLastIndex(t *testing.T) {
 	})
 
 	assert.Equal(2, b)
+
+	c := a.FindLastIndex(func(i int) bool {
+		return i > 3
+	})
+
+	assert.Equal(-1, c)
 }
 
 func TestArray_Each(t *testing.T) {
@@ -189,6 +213,17 @@ func TestArray_Each(t *testing.T) {
 	a.Each(func(i int, v int) {
 		assert.Equal(i+1, v)
 	})
+}
+
+func TestArray_Copy(t *testing.T) {
+	assert := assert.New(t)
+
+	var a Array[int]
+	a.AppendAll(1, 2, 3)
+
+	b := a.Copy()
+
+	assert.Equal(3, b.Len())
 }
 
 func TestArray_EachIndex(t *testing.T) {
@@ -253,19 +288,19 @@ func TestArray_Sort(t *testing.T) {
 	assert := assert.New(t)
 
 	var a Array[int]
-	a.AppendAll(1, 2, 3)
+	a.AppendAll(1, 1, 5, 6, 8, 2, 3, 5, 9, 3, 5, 6, 7, 8, 9, 0, 4, 3, 2, 1)
 
 	a.Sort(true)
 
-	assert.Equal(1, a[0])
-	assert.Equal(2, a[1])
-	assert.Equal(3, a[2])
+	assert.Equal(0, a[0])
+	assert.Equal(1, a[1])
+	assert.Equal(1, a[2])
 
 	a.Sort(false)
 
-	assert.Equal(3, a[0])
-	assert.Equal(2, a[1])
-	assert.Equal(1, a[2])
+	assert.Equal(9, a[0])
+	assert.Equal(9, a[1])
+	assert.Equal(8, a[2])
 }
 
 func TestArray_Reverse(t *testing.T) {
@@ -303,6 +338,10 @@ func TestArray_Insert(t *testing.T) {
 	a.Insert(1, 4)
 
 	assert.Equal(4, a[1])
+
+	// Error
+	err := a.Insert(10, 4)
+	assert.NotNil(err)
 }
 
 func TestArray_Remove(t *testing.T) {
@@ -315,6 +354,10 @@ func TestArray_Remove(t *testing.T) {
 	a.Remove(1)
 
 	assert.Equal(3, a[1])
+
+	// Error
+	err := a.Remove(10)
+	assert.NotNil(err)
 }
 
 func TestArray_RemoveRange(t *testing.T) {
@@ -353,4 +396,8 @@ func TestArray_InsertArray(t *testing.T) {
 	a.InsertArray(1, b)
 
 	assert.Equal(4, a[1])
+
+	// Error
+	err := a.InsertArray(10, b)
+	assert.NotNil(err)
 }
