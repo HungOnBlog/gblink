@@ -260,6 +260,12 @@ func TestMapStringInterface_GetDeep(t *testing.T) {
 	v, err = m.GetDeep("four")
 	assert.Nil(err)
 	assert.Equal(MapStringInterface{"five": 5, "six": 6}, v)
+
+	_, err = m.GetDeep("four.five.six")
+	assert.NotNil(err)
+
+	_, err = m.GetDeep("four.seven.six")
+	assert.NotNil(err)
 }
 
 func TestMapStringInterface_getDeep(t *testing.T) {
@@ -311,6 +317,9 @@ func TestMapStringInterface_SetDeep(t *testing.T) {
 
 	m.SetDeep("four", 9)
 	assert.Equal(9, m["four"])
+
+	m.SetDeep("four.five.six", 10)
+	assert.Equal(10, m["four"].(MapStringInterface)["five"].(MapStringInterface)["six"])
 }
 
 func TestMapStringInterface_setDeep(t *testing.T) {
@@ -353,6 +362,15 @@ func TestMapStringInterface_DeleteDeep(t *testing.T) {
 	m.DeleteDeep("four.five")
 	assert.Equal(1, m["four"].(MapStringInterface).Len())
 	assert.Equal(6, m["four"].(MapStringInterface)["six"])
+
+	m.DeleteDeep("seven.seven")
+	assert.Equal(1, m["four"].(MapStringInterface).Len())
+
+	m.DeleteDeep("four.seven")
+	assert.Equal(1, m["four"].(MapStringInterface).Len())
+
+	m.DeleteDeep("three.five")
+	assert.Equal(4, m.Len())
 }
 
 func TestMapStringInterface_deleteDeep(t *testing.T) {
@@ -393,6 +411,9 @@ func TestMapStringInterface_HasDeep(t *testing.T) {
 	assert.True(m.HasDeep("one"))
 	assert.True(m.HasDeep("four.five"))
 	assert.False(m.HasDeep("four.seven"))
+
+	assert.False(m.HasDeep("four.five.six"))
+	assert.False(m.HasDeep("four.seven.six"))
 }
 
 func TestMapStringInterface_hasDeep(t *testing.T) {
@@ -507,6 +528,13 @@ func TestMapStringInterface_MergeDeep(t *testing.T) {
 			"five":  5,
 			"seven": 7,
 			"eight": 8,
+			"nine": MapStringInterface{
+				"ten":    10,
+				"eleven": 11,
+				"twelve": MapStringInterface{
+					"thirteen": 13,
+				},
+			},
 		},
 	}
 
@@ -514,9 +542,15 @@ func TestMapStringInterface_MergeDeep(t *testing.T) {
 	assert.Equal(4, m3.Len())
 	assert.Equal(3, m3["three"])
 	m3four := m3["four"].(MapStringInterface)
-	assert.Equal(4, m3four.Len())
+	assert.Equal(5, m3four.Len())
 	assert.Equal(5, m3four["five"])
 	assert.Equal(6, m3four["six"])
 	assert.Equal(7, m3four["seven"])
 	assert.Equal(8, m3four["eight"])
+
+	m3FourNine := m3four["nine"].(MapStringInterface)
+	assert.Equal(3, m3FourNine.Len())
+
+	m3FourNineTwelve := m3FourNine["twelve"].(MapStringInterface)
+	assert.Equal(1, m3FourNineTwelve.Len())
 }
