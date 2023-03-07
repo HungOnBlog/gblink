@@ -1,7 +1,6 @@
 package gblink
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -52,7 +51,6 @@ func TestBloomFilter_CalculateNumberOfHashFunctions(t *testing.T) {
 	// run test cases
 	for _, tc := range testCases {
 		k := CalculateBloomFilterNumHashFunctions(tc.bitSetSize, tc.numItems)
-		fmt.Println(k)
 		assert.Equal(tc.expectedK, k)
 	}
 }
