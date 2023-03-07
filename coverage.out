@@ -269,3 +269,9 @@ github.com/HungOnBlog/gblink/map_string_interface.go:661.56,663.5 1 1
 github.com/HungOnBlog/gblink/map_string_interface.go:663.10,665.5 1 1
 github.com/HungOnBlog/gblink/map_string_interface.go:666.9,668.4 1 1
 github.com/HungOnBlog/gblink/map_string_interface.go:671.2,671.18 1 1
+github.com/HungOnBlog/gblink/token_bucket.go:17.71,24.2 1 1
+github.com/HungOnBlog/gblink/token_bucket.go:27.41,37.29 6 1
+github.com/HungOnBlog/gblink/token_bucket.go:37.29,39.3 1 0
+github.com/HungOnBlog/gblink/token_bucket.go:42.2,42.19 1 1
+github.com/HungOnBlog/gblink/token_bucket.go:42.19,46.3 3 1
+github.com/HungOnBlog/gblink/token_bucket.go:47.2,47.14 1 1

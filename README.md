@@ -25,6 +25,7 @@ If you don't want to install the package, you can also use it directly in your c
   - [Algorithms](#algorithms)
     - [Rate Limiter](#rate-limiter)
       - [Leaky Bucket](#leaky-bucket)
+      - [Token Bucket](#token-bucket)
 
 ## Data Structures
 
@@ -1717,7 +1718,8 @@ func ExampleBloomFilter() {
 
 Leaky Bucket is a token bucket algorithm that is used to limit the rate of data transfer. It is a simple algorithm that allows bursts of data, but limits the average rate of data transfer.
 
-Leaky Bucket is implemented using a channel that is used to store water. The channel is initialized to a fixed size. When data is transferred, a water is removed from the channel (leak). If the channel is empty, then no data is transferred. When water is removed from the channel, a new water is added to the channel after a fixed time interval. The size of the channel determines the maximum burst size.
+Leaky Bucket is implemented using a channel that is used to store water. The channel is initialized to a fixed size. When data is transferred, a water is added from the channel. If the channel is full, then no data is transferred.
+Water is also leaked from the channel at a fixed rate. The leak rate is determined by the size of the channel and the time interval between leaks.
 
 You can read more about Leaky Bucket [here](https://en.wikipedia.org/wiki/Leaky_bucket).
 
@@ -1816,6 +1818,100 @@ func ExampleLeakyBucket() {
   }
   time.Sleep(10 * time.Millisecond) // Wait for 10 milliseconds between each request.
  }
+}
+
+```
+
+#### Token Bucket
+
+Token Bucket is a token bucket algorithm that is used to limit the rate of data transfer. It is a simple algorithm that allows bursts of data, but limits the average rate of data transfer.
+
+Token Bucket is implemented using a channel that is used to store tokens. The channel is initialized to a fixed size. When a request invokes the algorithm, a token is removed from the channel. If the channel is empty, then no data is transferred. When a token is removed from the channel, a new token is added to the channel after a fixed time interval. The size of the channel determines the maximum burst size.
+
+You can read more about Token Bucket [here](https://en.wikipedia.org/wiki/Token_bucket).
+
+```go
+package gblink
+
+import (
+ "fmt"
+ "sync"
+ "time"
+)
+
+type TokenBucket struct {
+ tokens        uint64        // Current number of tokens in the bucket.
+ capacity      uint64        // Maximum number of tokens that the bucket can hold.
+ rate          time.Duration // Rate at which tokens are added to the bucket.
+ mu            sync.Mutex    // Mutex to synchronize access to the bucket.
+ lastTokenTime time.Time     // Last time a token was added to the bucket.
+}
+
+// NewTokenBucket creates a new Token Bucket with the specified capacity and refill rate.
+func NewTokenBucket(capacity uint64, rate time.Duration) *TokenBucket {
+ return &TokenBucket{
+  tokens:        capacity,
+  capacity:      capacity,
+  rate:          rate,
+  lastTokenTime: time.Now(),
+ }
+}
+
+// TakeToken attempts to take a token from the bucket.
+func (tb *TokenBucket) TakeToken() bool {
+ tb.mu.Lock()
+ defer tb.mu.Unlock()
+
+ // Calculate the number of tokens that should have been added since the last token was added.
+ elapsedTime := time.Since(tb.lastTokenTime)
+ numTokensToAdd := uint64(elapsedTime.Nanoseconds() / tb.rate.Nanoseconds())
+
+ // Add the calculated tokens to the bucket, up to the capacity of the bucket.
+ tb.tokens += numTokensToAdd
+ if tb.tokens > tb.capacity {
+  tb.tokens = tb.capacity
+ }
+
+ // Attempt to take a token from the bucket.
+ if tb.tokens > 0 {
+  tb.tokens--
+  tb.lastTokenTime = time.Now()
+  return true
+ }
+ return false
+}
+
+// Example of a token bucket.
+// Limit the rate of incoming requests to 100 requests per second.
+func ExampleTokenBucket() {
+ // Create a new token bucket with a capacity of 100 tokens and a fill rate of 100 tokens per second.
+ tb := NewTokenBucket(100, 100)
+
+ // Simulate 1000 incoming requests over the course of 11 seconds.
+ start := time.Now()
+ for i := 0; i < 1000; i++ {
+  // Wait for the token bucket to allow the request to proceed.
+  for !tb.TakeToken() {
+   time.Sleep(time.Millisecond * 10)
+  }
+
+  // Process the request.
+  processRequest()
+
+  // Throttle the request rate to exactly 100 requests per second.
+  if i%10 == 9 {
+   time.Sleep(time.Second / 100)
+  }
+ }
+ elapsed := time.Since(start)
+
+ // Print some statistics about the simulation.
+ fmt.Printf("Processed %d requests in %s (%.2f requests per second)\n", 1000, elapsed, float64(1000)/elapsed.Seconds())
+}
+
+func processRequest() {
+ // Simulate some work.
+ time.Sleep(time.Millisecond * 50)
 }
 
 ```
