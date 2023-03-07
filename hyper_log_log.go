@@ -21,14 +21,7 @@ type Hasher interface {
 	Sum64([]byte) uint64
 }
 
-// defaultHasher is a simple implementation of the Hasher interface that uses the Murmur3 hash function.
-type defaultHasher struct {
-}
-
-func (h defaultHasher) Sum64(data []byte) uint64 {
-	return murmur3.Sum64(data)
-}
-
+// defaultHasher is a simple implementation of the Hasher interface that uses the Murmur3 hash function
 // HyperLogLog is a probabilistic data structure that approximates the cardinality of a set with high accuracy and low memory usage.
 type HyperLogLog struct {
 	m         uint32
