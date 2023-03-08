@@ -573,3 +573,46 @@ func (a *Array[T]) InsertArray(index int, array Array[T]) error {
 	copy((*a)[index:], array)
 	return nil
 }
+
+// Reduce applies a function against an accumulator and each value of the array (from left-to-right) as to reduce it to a single value.
+//
+// Example:
+//
+//	var array Array[int]
+//	array.Append(1)
+//	array.Append(2)
+//	array.Append(3)
+//	sum := array.Reduce(func(accumulator, value int) int {
+//		return accumulator + value
+//	}, 0)
+//	fmt.Println(sum) // 6
+func (a *Array[T]) Reduce(fn func(accumulator, value T) T, accumulator T) T {
+	for _, v := range *a {
+		accumulator = fn(accumulator, v)
+	}
+	return accumulator
+}
+
+// ReduceIf applies a function against an accumulator and each value of the array (from left-to-right) as to reduce it to a single value.
+// The function is only applied to the values that satisfy the given predicate.
+//
+// Example:
+//
+//	var array Array[int]
+//	array.Append(1)
+//	array.Append(2)
+//	array.Append(3)
+//	sum := array.ReduceIf(func(accumulator, value int) int {
+//		return accumulator + value
+//	}, 0, func(value int) bool {
+//		return value > 1
+//	})
+//	fmt.Println(sum) // 5
+func (a *Array[T]) ReduceIf(fn func(accumulator, value T) T, predicate func(value T) bool, accumulator T) T {
+	for _, v := range *a {
+		if predicate(v) {
+			accumulator = fn(accumulator, v)
+		}
+	}
+	return accumulator
+}
