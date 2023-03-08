@@ -6,105 +6,65 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestTree_Set(t *testing.T) {
+func TestTree_AddChild(t *testing.T) {
 	assert := assert.New(t)
 
-	tree := NewTree[int, string]()
-	tree.Set(1, "one")
-	tree.Set(2, "two")
-	tree.Set(3, "three")
+	node := NewTreeNode("key", "value")
+	child := NewTreeNode("child", "value")
+	node.AddChild(child)
 
-	assert.Equal("one", tree.Root.Value)
+	assert.Equal(node.Children[0].Key, "child")
 }
 
-func TestTree_Get(t *testing.T) {
+func TestTree_RemoveChild(t *testing.T) {
 	assert := assert.New(t)
 
-	tree := NewTree[int, string]()
-	tree.Set(1, "one")
-	tree.Set(2, "two")
-	tree.Set(3, "three")
+	node := NewTreeNode("key", "value")
+	child := NewTreeNode("child", "value")
+	node.AddChild(child)
+	node.RemoveChild(child)
 
-	value, err := tree.Get(2)
-	assert.Nil(err)
-	assert.Equal("two", value)
-
-	_, err = tree.Get(4)
-	assert.NotNil(err)
+	assert.Equal(0, len(node.Children))
 }
 
-func TestTree_Delete(t *testing.T) {
+func TestTree_RemoveChildKey(t *testing.T) {
 	assert := assert.New(t)
 
-	tree := NewTree[int, string]()
-	tree.Set(1, "one")
-	tree.Set(2, "two")
-	tree.Set(3, "three")
+	node := NewTreeNode("key", "value")
+	child := NewTreeNode("child", "value")
+	node.AddChild(child)
+	node.RemoveChildKey("child")
 
-	tree.Delete(2)
-	assert.Equal("one", tree.Root.Value)
-	assert.Equal("three", tree.Root.Right.Value)
+	assert.Equal(0, len(node.Children))
 }
 
-func TestTree_Len(t *testing.T) {
+func TestTree_RemoveChildAt(t *testing.T) {
 	assert := assert.New(t)
 
-	tree := NewTree[int, string]()
-	tree.Set(1, "one")
-	tree.Set(2, "two")
-	tree.Set(3, "three")
+	node := NewTreeNode("key", "value")
+	child := NewTreeNode("child", "value")
+	node.AddChild(child)
+	node.RemoveChildAt(0)
 
-	assert.Equal(3, tree.Len())
+	assert.Equal(0, len(node.Children))
 }
 
-func TestTree_DeleteMin(t *testing.T) {
+func TestTree_LenChildren(t *testing.T) {
 	assert := assert.New(t)
 
-	tree := NewTree[int, string]()
-	tree.Set(1, "one")
-	tree.Set(2, "two")
-	tree.Set(3, "three")
+	node := NewTreeNode("key", "value")
+	child := NewTreeNode("child", "value")
+	node.AddChild(child)
 
-	tree.DeleteMin(tree.Root)
-	assert.Equal("one", tree.Root.Value)
-	assert.Equal("two", tree.Root.Right.Value)
+	assert.Equal(1, node.LenChildren())
 }
 
-func TestTree_Min(t *testing.T) {
+func TestTree_SetParent(t *testing.T) {
 	assert := assert.New(t)
 
-	tree := NewTree[int, string]()
-	tree.Set(1, "one")
-	tree.Set(2, "two")
-	tree.Set(3, "three")
+	node := NewTreeNode("key", "value")
+	child := NewTreeNode("child", "value")
+	child.SetParent(node)
 
-	assert.Equal("one", tree.Min(tree.Root).Value)
-}
-
-func TestTree_Keys(t *testing.T) {
-	assert := assert.New(t)
-
-	tree := NewTree[int, string]()
-	tree.Set(1, "one")
-	tree.Set(2, "two")
-	tree.Set(3, "three")
-
-	keys := tree.Keys()
-	assert.Equal(3, len(keys))
-	assert.Equal(1, keys[0])
-	assert.Equal(2, keys[1])
-	assert.Equal(3, keys[2])
-}
-
-func TestTree_Max(t *testing.T) {
-	assert := assert.New(t)
-
-	tree := NewTree[int, string]()
-	tree.Set(1, "one")
-	tree.Set(2, "two")
-	tree.Set(3, "three")
-
-	maxKey, err := tree.Max()
-	assert.Nil(err)
-	assert.Equal(3, maxKey)
+	assert.Equal(node, child.Parent)
 }
