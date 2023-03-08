@@ -297,6 +297,16 @@ github.com/HungOnBlog/gblink/map_string_interface.go:661.56,663.5 1 1
 github.com/HungOnBlog/gblink/map_string_interface.go:663.10,665.5 1 1
 github.com/HungOnBlog/gblink/map_string_interface.go:666.9,668.4 1 1
 github.com/HungOnBlog/gblink/map_string_interface.go:671.2,671.18 1 1
+github.com/HungOnBlog/gblink/queue.go:12.34,14.2 1 1
+github.com/HungOnBlog/gblink/queue.go:27.30,29.2 1 1
+github.com/HungOnBlog/gblink/queue.go:44.37,45.18 1 1
+github.com/HungOnBlog/gblink/queue.go:45.18,48.3 2 1
+github.com/HungOnBlog/gblink/queue.go:49.2,51.15 3 1
+github.com/HungOnBlog/gblink/queue.go:67.38,68.18 1 1
+github.com/HungOnBlog/gblink/queue.go:68.18,71.3 2 0
+github.com/HungOnBlog/gblink/queue.go:72.2,72.21 1 1
+github.com/HungOnBlog/gblink/queue.go:78.30,80.2 1 1
+github.com/HungOnBlog/gblink/queue.go:85.35,87.2 1 1
 github.com/HungOnBlog/gblink/stack.go:12.34,14.2 1 1
 github.com/HungOnBlog/gblink/stack.go:27.30,29.2 1 1
 github.com/HungOnBlog/gblink/stack.go:44.37,45.18 1 1
