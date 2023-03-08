@@ -401,3 +401,43 @@ func TestArray_InsertArray(t *testing.T) {
 	err := a.InsertArray(10, b)
 	assert.NotNil(err)
 }
+
+func TestArray_Reduce(t *testing.T) {
+	assert := assert.New(t)
+
+	var a Array[int]
+
+	a.AppendAll(1, 2, 3, 4, 5)
+
+	b := a.Reduce(func(i, j int) int {
+		return i + j
+	}, 0)
+
+	assert.Equal(15, b)
+
+	var c Array[string]
+
+	c.AppendAll("a", "b", "c", "d", "e")
+
+	d := c.Reduce(func(i, j string) string {
+		return i + j
+	}, "")
+
+	assert.Equal("abcde", d)
+}
+
+func TestArray_ReduceIf(t *testing.T) {
+	assert := assert.New(t)
+
+	var a Array[int]
+
+	a.AppendAll(1, 2, 3, 4, 5)
+
+	b := a.ReduceIf(func(i, j int) int {
+		return i + j
+	}, func(i int) bool {
+		return i%2 == 0
+	}, 0)
+
+	assert.Equal(6, b)
+}
