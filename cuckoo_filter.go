@@ -153,3 +153,8 @@ func (cf *CuckooFilter) Delete(item string) bool {
 
 	return false
 }
+
+// Clear clears the Cuckoo filter by resetting all the bits in the bitset.
+func (cf *CuckooFilter) Clear() {
+	cf.BucketArr = make([]*Bucket, cf.Size)
+}
