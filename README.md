@@ -31,6 +31,8 @@ If you don't want to install the package, you can also use it directly in your c
     - [Rate Limiter](#rate-limiter)
       - [Leaky Bucket](#leaky-bucket)
       - [Token Bucket](#token-bucket)
+  - [Tools](#tools)
+    - [Executor](#executor)
 
 ## Data Structures
 
@@ -2776,3 +2778,7 @@ func processRequest() {
 }
 
 ```
+
+## Tools
+
+### Executor
